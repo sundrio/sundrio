@@ -34,12 +34,12 @@ import static io.sundr.builder.internal.functions.TypeAs.combine;
 import static io.sundr.builder.internal.utils.BuilderUtils.getInlineableConstructors;
 import static io.sundr.builder.internal.utils.BuilderUtils.isBuildable;
 import static io.sundr.model.Expression.call;
-import static io.sundr.model.Expression.cast;
 import static io.sundr.model.utils.Collections.COLLECTION;
 import static io.sundr.model.utils.Collections.IS_COLLECTION;
 import static io.sundr.model.utils.Collections.IS_LIST;
 import static io.sundr.model.utils.Collections.IS_MAP;
 import static io.sundr.model.utils.Collections.IS_SET;
+import static io.sundr.model.utils.Collections.LINKED_HASH_MAP;
 import static io.sundr.model.utils.Optionals.OPTIONAL;
 import static io.sundr.model.utils.Types.N_REF;
 import static io.sundr.model.utils.Types.Q;
@@ -59,7 +59,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -327,7 +326,7 @@ class ToMethod {
       if (IS_MAP.apply(type)) {
         statements.add(If.isNull(field)
             .then(This.ref(field).assignNull())
-            .orElse(This.ref(field).assignNew(LinkedHashMap.class, field)));
+            .orElse(This.ref(field).assignNew(LINKED_HASH_MAP.toReference(), field)));
 
         statements.add(new Return(Expression.cast(returnType, new This())));
         return statements;
@@ -1008,8 +1007,14 @@ class ToMethod {
             Field propertyRef = Field.newField(propertyName);
             LocalVariable eachProperty = LocalVariable.newLocalVariable(
                 new ClassRefBuilder().withFullyQualifiedName("java.util.Iterator").withArguments(builder).build(), "each");
-            LocalVariable visitablesProperty = LocalVariable
-                .newLocalVariable(new ClassRefBuilder().withFullyQualifiedName("java.util.List").build(), "visitables");
+            LocalVariable visitablesProperty = new LocalVariable(
+                Collections.emptyList(),
+                List.of(BuilderUtils.getSuppressWarnings("rawtypes")),
+                new ClassRefBuilder().withFullyQualifiedName("java.util.List").build(),
+                "visitables",
+                Optional.empty(),
+                false,
+                Collections.emptyMap());
 
             LocalVariable builderProperty = LocalVariable.newLocalVariable(builder, "builder");
             Argument predicateProperty = Argument.newArgument("predicate");
@@ -1759,12 +1764,6 @@ class ToMethod {
         prefix = "setTo";
       } else if (isMap) {
         prefix = "addTo";
-      }
-      String indexOrKey = "";
-      if (isArray || isList) {
-        indexOrKey = "index,";
-      } else if (isMap) {
-        indexOrKey = "key,";
       }
       String withMethodName = prefix + property.getNameCapitalized();
       if (property.hasAttribute(Constants.DESCENDANT_OF)) {

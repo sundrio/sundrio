@@ -69,6 +69,7 @@ import io.sundr.builder.internal.functions.ToConstructExpression;
 import io.sundr.builder.internal.functions.TypeAs;
 import io.sundr.functions.Singularize;
 import io.sundr.model.AnnotationRef;
+import io.sundr.model.AnnotationRefBuilder;
 import io.sundr.model.Argument;
 import io.sundr.model.ClassRef;
 import io.sundr.model.ClassRefBuilder;
@@ -910,33 +911,58 @@ public class BuilderUtils {
 
   public static List<Statement> toEquals(WithFullyQualifiedName WithFullyQualifiedName, Collection<Field> fields) {
     List<Statement> statements = new ArrayList<>();
-
-    String name = WithFullyQualifiedName.getName();
-    ClassRef type = ClassRef.forName(name);
     LocalVariable o = LocalVariable.newLocalVariable("o");
-    LocalVariable that = LocalVariable.newLocalVariable(type, "that");
-
     statements.add(If.eq(new This(), o).then(Return.True()));
     statements.add(If.isNull(o)
         .or(new This().call("getClass").ne(o.call("getClass")))
         .then(Return.False()));
-
     statements.add(If.not(new Super().call("equals", o)).then(Return.False()));
-    statements.add(Declare.cast("that", type, o));
 
-    for (Field field : fields) {
-      String fieldName = field.getName();
-      TypeRef propertyType = field.getTypeRef();
-      if (Types.isPrimitive(propertyType)) {
-        statements.add(If.ne(field, that.property(fieldName))
-            .then(Return.False()));
-      } else {
-        statements.add(If.not(ClassRef.forClass(java.util.Objects.class).call("equals", field, that.property(fieldName)))
-            .then(Return.False()));
+    if (!fields.isEmpty()) {
+      // Build the cast target type: use wildcards for all type parameters so the
+      // generated cast is e.g. (FooFluent<?>) rather than the raw (FooFluent),
+      // which would cause "unchecked cast" / "raw types" compiler warnings.
+      int paramCount = 0;
+      if (WithFullyQualifiedName instanceof ClassRef) {
+        paramCount = ((ClassRef) WithFullyQualifiedName).getArguments().size();
+      } else if (WithFullyQualifiedName instanceof TypeDef) {
+        paramCount = ((TypeDef) WithFullyQualifiedName).getParameters().size();
+      }
+      List<TypeRef> wildcards = new ArrayList<>();
+      for (int i = 0; i < paramCount; i++) {
+        wildcards.add(new WildcardRef());
+      }
+      ClassRef type = new ClassRefBuilder().withFullyQualifiedName(WithFullyQualifiedName.getFullyQualifiedName())
+          .withArguments(wildcards).build();
+      LocalVariable that = LocalVariable.newLocalVariable(type, "that");
+
+      statements.add(Declare.cast("that", type, o));
+
+      for (Field field : fields) {
+        String fieldName = field.getName();
+        TypeRef propertyType = field.getTypeRef();
+        if (Types.isPrimitive(propertyType)) {
+          statements.add(If.ne(field, that.property(fieldName))
+              .then(Return.False()));
+        } else {
+          statements.add(If.not(ClassRef.forClass(java.util.Objects.class).call("equals", field, that.property(fieldName)))
+              .then(Return.False()));
+        }
       }
     }
 
     statements.add(Return.True());
     return statements;
+  }
+
+  public static AnnotationRef getSuppressWarnings(String... warningNames) {
+    return new AnnotationRefBuilder()
+        .withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
+        .addToParameters("value", warningNames)
+        .build();
+  }
+
+  public static AnnotationRef getSuppressWarnings(List<String> warningNames) {
+    return getSuppressWarnings(warningNames.toArray(String[]::new));
   }
 }

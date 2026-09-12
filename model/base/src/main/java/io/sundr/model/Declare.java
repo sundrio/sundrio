@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class Declare implements ExpressionOrStatement {
 
@@ -21,19 +20,19 @@ public class Declare implements ExpressionOrStatement {
   // Auxliliary constructors
   //
   public Declare(Variable<?> variable, Expression expression) {
-    this(Arrays.asList(variable.asLocalVariable()), Optional.of(expression));
+    this(Arrays.asList(asLocalVariable(variable)), Optional.of(expression));
   }
 
   public Declare(Variable<?> variable, Object value, Object... rest) {
-    this(Arrays.asList(variable.asLocalVariable()), Optional.of(ValueRef.from(value, rest)));
+    this(Arrays.asList(asLocalVariable(variable)), Optional.of(ValueRef.from(value, rest)));
   }
 
   public Declare(Variable<?> variable, Variable<?> valueVariable) {
-    this(Arrays.asList(variable.asLocalVariable()), Optional.of(valueVariable));
+    this(Arrays.asList(asLocalVariable(variable)), Optional.of(valueVariable));
   }
 
   public Declare(Variable<?> variable) {
-    this.localVariables = Arrays.asList(variable.asLocalVariable());
+    this.localVariables = Arrays.asList(asLocalVariable(variable));
     this.value = Optional.empty();
   }
 
@@ -45,6 +44,15 @@ public class Declare implements ExpressionOrStatement {
   public Declare(Class type, String name, Object value) {
     this.localVariables = Arrays.asList(LocalVariable.newLocalVariable(ClassRef.forClass(type), name));
     this.value = Optional.of(ValueRef.from(value));
+  }
+
+  /**
+   * Use the variable as-is when it's already a LocalVariable. This preserves properties
+   * such as annotations on the generated declaration. Otherwise, for non-LocalVariable
+   * instances, convert it.
+   */
+  private static LocalVariable asLocalVariable(Variable<?> variable) {
+    return variable instanceof LocalVariable ? (LocalVariable) variable : variable.asLocalVariable();
   }
 
   //
@@ -100,11 +108,19 @@ public class Declare implements ExpressionOrStatement {
   @Override
   public String renderExpression() {
     StringBuilder sb = new StringBuilder();
-    TypeRef typeRef = localVariables.get(0).getTypeRef();
-    sb.append(typeRef.render());
-    sb.append(SPACE);
-    sb.append(localVariables.stream().map(LocalVariable::getName).collect(Collectors.joining(", ")));
-    sb.append(value.map(v -> " = " + v.renderExpression()).orElse(""));
+    // Since we can have multiple variables but only a single value expression,
+    // each variable will be assigned the same value, if present. It is up to the
+    // caller to ensure the value is valid for all variables. All variable
+    // declarations will include any annotations that may be present.
+    for (int i = 0, m = localVariables.size(); i < m; i++) {
+      if (i > 0) {
+        sb.append(SEMICOLN);
+        sb.append(NEWLINE);
+      }
+      sb.append(localVariables.get(i).renderAnnotations());
+      sb.append(localVariables.get(i).render());
+      value.ifPresent(v -> sb.append(" = ").append(v.renderExpression()));
+    }
     return sb.toString();
   }
 }

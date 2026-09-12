@@ -20,8 +20,12 @@ import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.model.utils.Types.isAbstract;
 
+import java.time.Clock;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -32,6 +36,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
 
@@ -282,9 +287,8 @@ public class ClazzAs {
                   .withName(fluent.getName())
                   .withParameters(parameters)
                   .withExtendsList(superClassRef)
-                  .withAnnotations(
-                      new AnnotationRefBuilder().withClassRef(ClassRef.forName(SuppressWarnings.class.getCanonicalName()))
-                          .addToParameters("value", "unchecked").build())
+                  .withAnnotations(getSuppressWarnings(item, fields))
+                  .addToAnnotations(getGenerated())
                   .withConstructors(constructors)
                   .withFields(fields).withInnerTypes(nestedClazzes).withMethods(allMethods)
                   .accept(new AddNoArgWithMethod())
@@ -352,7 +356,6 @@ public class ClazzAs {
       ClassRef itemRef = item.toInternalReference();
       ClassRef fluent = TypeAs.FLUENT_Q_REF.apply(itemRef);
       ClassRef fluentImplRef = TypeAs.FLUENT_REF.apply(itemRef);
-      ClassRef builderRef = TypeAs.BUILDER_REF.apply(itemRef);
       ClassRef visitableBuilderRef = TypeAs.VISITABLE_BUILDER_REF.apply(itemRef);
 
       Optional<TypeDef> buildableInterface = item.getImplementsList().stream().map(GetDefinition::of)
@@ -366,6 +369,8 @@ public class ClazzAs {
       final List<Field> fields = new ArrayList<Field>();
 
       Field fluentProperty = new FieldBuilder().withTypeRef(fluent).withName("fluent").build();
+      LocalVariable fluentLocalVar = LocalVariable.newLocalVariable(fluent, "fluent");
+      LocalVariable instanceLocalVar = LocalVariable.newLocalVariable(itemRef, "instance");
 
       fields.add(fluentProperty);
 
@@ -374,30 +379,30 @@ public class ClazzAs {
           .withNewBlock()
           .addToStatements(
               hasDefaultConstructor(item) ? This.construct(item.toInternalReference().construct())
-                  : new Assign(This.ref("fluent"), new This()))
+                  : new Assign(This.ref(fluentProperty), new This()))
           .endBlock().build();
 
       Method fluentConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(fluent).withName("fluent").and().withNewBlock()
           .addToStatements(hasDefaultConstructor(item)
-              ? This.construct(LocalVariable.newLocalVariable("fluent"), item.toInternalReference().construct())
-              : new Assign(This.ref("fluent"), LocalVariable.newLocalVariable("fluent")))
+              ? This.construct(fluentLocalVar, item.toInternalReference().construct())
+              : new Assign(This.ref(fluentProperty), fluentLocalVar))
           .endBlock().build();
 
       Method instanceAndFluentCosntructor = new MethodBuilder()
           .withNewModifiers().withPublic().endModifiers()
           .addNewArgument().withTypeRef(fluent).withName("fluent").and().addNewArgument().withTypeRef(itemRef)
           .withName("instance").and().withNewBlock()
-          .addToStatements(new Assign(This.ref("fluent"), LocalVariable.newLocalVariable("fluent")))
-          .addToStatements(new MethodCall("copyInstance", LocalVariable.newLocalVariable("fluent"),
-              LocalVariable.newLocalVariable("instance")))
+          .addToStatements(new Assign(This.ref(fluentProperty), fluentLocalVar))
+          .addToStatements(new MethodCall("copyInstance", fluentLocalVar, instanceLocalVar))
           .endBlock()
           .build();
 
       Method instanceConstructor = new MethodBuilder().withNewModifiers().withPublic().endModifiers().addNewArgument()
           .withTypeRef(itemRef).withName("instance").and().withNewBlock()
-          .addToStatements(new Assign(This.ref("fluent"), new This()))
-          .addToStatements(new MethodCall("copyInstance", new This(), LocalVariable.newLocalVariable("instance"))).endBlock()
+          .addToStatements(new Assign(This.ref(fluentProperty), new This()))
+          .addToStatements(new MethodCall("copyInstance", new This(), instanceLocalVar))
+          .endBlock()
           .build();
 
       basicConstructors.add(emptyConstructor);
@@ -542,7 +547,8 @@ public class ClazzAs {
 
       return BuilderContextManager.getContext().getDefinitionRepository()
           .register(new TypeDefBuilder()
-              .withAnnotations()
+              .withAnnotations(getSuppressWarnings(item, Collections.emptyList()))
+              .addToAnnotations(getGenerated())
               .withPackageName(item.getPackageName())
               .withName(item.getName() + "Builder")
               .withParameters(item.getParameters())
@@ -563,7 +569,7 @@ public class ClazzAs {
               : new Modifier[] { Modifier.PUBLIC };
 
           final TypeDef editable = EDITABLE.apply(item);
-          return new TypeDefBuilder(BUILDER.apply(item)).withComments("Generated").withAnnotations()
+          return new TypeDefBuilder(BUILDER.apply(item)).withComments("Generated").withAnnotations(getGenerated())
               .accept(new Visitor<MethodBuilder>() {
                 public void visit(MethodBuilder builder) {
                   if (builder.getName() != null && builder.getName().equals("build")) {
@@ -599,7 +605,7 @@ public class ClazzAs {
       //We need to treat the editable classes as buildables themselves.
       return AptContext.getContext().getDefinitionRepository()
           .register(BuilderContextManager.getContext().getBuildableRepository()
-              .register(new TypeDefBuilder(editableType).withComments("Generated").withAnnotations()
+              .register(new TypeDefBuilder(editableType).withComments("Generated").withAnnotations(getGenerated())
                   .withModifiers(Modifiers.from(modifiers)).withConstructors(constructors).withMethods(methods)
                   .addToAttributes(BUILDABLE_ENABLED, true).addToAttributes(GENERATED, true) // We want to know that its a generated type...
                   .addToAttributes(IGNORE_PROPERTIES, item.getAttribute(IGNORE_PROPERTIES)) // We want to know that its a generated type...
@@ -673,16 +679,14 @@ public class ClazzAs {
 
     // Build constructor arguments
     List<Expression> constructorArgs = new ArrayList<>();
-    LocalVariable fluent = LocalVariable.newLocalVariable("fluent");
+    LocalVariable fluent = LocalVariable.newLocalVariable(item.toInternalReference(), "fluent");
     for (Argument arg : constructor.getArguments()) {
       constructorArgs
           .add(new MethodCall(ToMethod.getterOrBuildMethodName(Field.newField(arg.getTypeRef(), arg.getName())), fluent));
     }
 
-    LocalVariable buildable = LocalVariable.newLocalVariable("buildable");
-    statements.add(new Declare(
-        LocalVariable.newLocalVariable(instanceType.toInternalReference(), "buildable"),
-        instanceType.toReference().construct(constructorArgs)));
+    LocalVariable buildable = LocalVariable.newLocalVariable(instanceType.toInternalReference(), "buildable");
+    statements.add(new Declare(buildable, instanceType.toReference().construct(constructorArgs)));
 
     Predicate<Field> propertyFilter = isFieldApplicable(item, false);
     item.getAllFields().stream()
@@ -697,7 +701,7 @@ public class ClazzAs {
               new MethodCall(ToMethod.getterOrBuildMethodName(property), fluent)));
         });
 
-    statements.add(Return.variable("buildable"));
+    statements.add(Return.variable(buildable));
     return statements;
   }
 
@@ -754,5 +758,46 @@ public class ClazzAs {
       }
       return true;
     };
+  }
+
+  /**
+   * Create a singleton list with a SuppressWarnings annotation for several warnings that may
+   * apply to the item and the added fields.
+   */
+  private static List<AnnotationRef> getSuppressWarnings(RichTypeDef item, List<Field> addedFields) {
+    List<String> suppressions = new ArrayList<>();
+
+    if (!addedFields.isEmpty()) {
+      suppressions.add("unchecked");
+    }
+
+    item.getAllFields().stream()
+        .filter(isFieldApplicable(item))
+        .flatMap(p -> p.getAnnotations().stream().filter(Constants.DEPRECATED_ANNOTATION::equals))
+        .flatMap(deprecated -> {
+          if (Boolean.TRUE.equals(deprecated.getParameters().get("forRemoval"))) {
+            return Stream.of("deprecation", "removal");
+          }
+          return Stream.of("deprecation");
+        })
+        .distinct()
+        .forEach(suppressions::add);
+
+    if (!suppressions.isEmpty()) {
+      return List.of(BuilderUtils.getSuppressWarnings(suppressions));
+    }
+
+    return Collections.emptyList();
+  }
+
+  /**
+   * Create a Generated annotation with the current date and time.
+   */
+  private static AnnotationRef getGenerated() {
+    return new AnnotationRefBuilder()
+        .withClassRef(ClassRef.forName(javax.annotation.processing.Generated.class.getCanonicalName()))
+        .addToParameters("value", "io.sundr:builder-annotations")
+        .addToParameters("date", OffsetDateTime.now(Clock.systemDefaultZone()).truncatedTo(ChronoUnit.MILLIS).toString())
+        .build();
   }
 }

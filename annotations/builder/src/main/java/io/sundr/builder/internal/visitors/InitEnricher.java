@@ -107,20 +107,25 @@ public class InitEnricher implements Visitor<FieldBuilder> {
         && (Boolean) builder.getAttributes().get(LAZY_MAP_INIT_ENABLED);
 
     if (isArray || isList) {
-      ClassRef listRef = isArray || isAbstractList
-          ? Collections.ARRAY_LIST.toReference(targetType)
-          : new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).withDimensions(0).build();
+      ClassRef listRef;
+      TypeDef listDef;
 
-      TypeDef listDef = new TypeDefBuilder(TypeDef.forName(listRef.getFullyQualifiedName()))
-          .addNewConstructor()
-          .endConstructor()
-          .addNewConstructor()
-          .addNewArgument()
-          .withTypeRef(Collections.LIST.toReference(targetType))
-          .withName("l")
-          .endArgument()
-          .endConstructor()
-          .build();
+      if (isArray || isAbstractList) {
+        listRef = Collections.ARRAY_LIST.toReference(targetType);
+        listDef = Collections.ARRAY_LIST;
+      } else {
+        listRef = new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).withDimensions(0).build();
+        listDef = new TypeDefBuilder(TypeDef.forName(listRef.getFullyQualifiedName()))
+            .addNewConstructor()
+            .endConstructor()
+            .addNewConstructor()
+            .addNewArgument()
+            .withTypeRef(Collections.LIST.toReference(targetType))
+            .withName("l")
+            .endArgument()
+            .endConstructor()
+            .build();
+      }
 
       builder.addToAttributes(LAZY_INIT, "new " + listRef + "()")
           .addToAttributes(INIT, lazyCollectionsInitEnabled ? null : builder.getAttributes().get(LAZY_INIT))
@@ -129,20 +134,25 @@ public class InitEnricher implements Visitor<FieldBuilder> {
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(listDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, listRef));
     } else if (isSet) {
-      ClassRef setRef = isAbstractSet
-          ? Collections.LINKED_HASH_SET.toReference(targetType)
-          : new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).build();
+      ClassRef setRef;
+      TypeDef setDef;
 
-      TypeDef setDef = new TypeDefBuilder(TypeDef.forName(setRef.getFullyQualifiedName()))
-          .addNewConstructor()
-          .endConstructor()
-          .addNewConstructor()
-          .addNewArgument()
-          .withTypeRef(Collections.SET.toReference(targetType))
-          .withName("s")
-          .endArgument()
-          .endConstructor()
-          .build();
+      if (isAbstractSet) {
+        setRef = Collections.LINKED_HASH_SET.toReference(targetType);
+        setDef = Collections.LINKED_HASH_SET;
+      } else {
+        setRef = new ClassRefBuilder((ClassRef) typeRef).withArguments(targetType).build();
+        setDef = new TypeDefBuilder(TypeDef.forName(setRef.getFullyQualifiedName()))
+            .addNewConstructor()
+            .endConstructor()
+            .addNewConstructor()
+            .addNewArgument()
+            .withTypeRef(Collections.SET.toReference(targetType))
+            .withName("s")
+            .endArgument()
+            .endConstructor()
+            .build();
+      }
 
       builder.addToAttributes(LAZY_INIT, "new " + setRef + "()")
           .addToAttributes(INIT, lazyCollectionsInitEnabled ? null : builder.getAttributes().get(LAZY_INIT))
@@ -151,20 +161,25 @@ public class InitEnricher implements Visitor<FieldBuilder> {
           .addToAttributes(INIT_EXPRESSION_FUNCTION, new ToConstructExpression(setDef, targetType))
           .addToAttributes(ALSO_IMPORT, Arrays.asList(targetType, setRef));
     } else if (isMap) {
-      ClassRef mapRef = isAbstractMap
-          ? Collections.LINKED_HASH_MAP.toReference(arguments)
-          : new ClassRefBuilder((ClassRef) typeRef).withArguments(arguments).build();
+      ClassRef mapRef;
+      TypeDef mapDef;
 
-      TypeDef mapDef = new TypeDefBuilder(TypeDef.forName(mapRef.getFullyQualifiedName()))
-          .addNewConstructor()
-          .endConstructor()
-          .addNewConstructor()
-          .addNewArgument()
-          .withTypeRef(Collections.MAP.toReference(arguments))
-          .withName("m")
-          .endArgument()
-          .endConstructor()
-          .build();
+      if (isAbstractMap) {
+        mapRef = Collections.LINKED_HASH_MAP.toReference(arguments);
+        mapDef = Collections.LINKED_HASH_MAP;
+      } else {
+        mapRef = new ClassRefBuilder((ClassRef) typeRef).withArguments(arguments).build();
+        mapDef = new TypeDefBuilder(TypeDef.forName(mapRef.getFullyQualifiedName()))
+            .addNewConstructor()
+            .endConstructor()
+            .addNewConstructor()
+            .addNewArgument()
+            .withTypeRef(Collections.MAP.toReference(arguments))
+            .withName("m")
+            .endArgument()
+            .endConstructor()
+            .build();
+      }
 
       builder.addToAttributes(LAZY_INIT, "new " + mapRef + "()")
           .addToAttributes(INIT, lazyMapInitEnabled ? null : builder.getAttributes().get(LAZY_INIT))

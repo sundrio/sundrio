@@ -133,7 +133,7 @@ public class AnnotationRef extends AttributeSupport implements Renderable {
           if (first) {
             first = false;
           } else {
-            sb.append(SPACE).append(COMA);
+            sb.append(COMA).append(SPACE);
           }
           sb.append(entry.getKey()).append(SPACE).append(EQ).append(SPACE).append(toString(value));
         }

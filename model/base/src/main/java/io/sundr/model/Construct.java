@@ -69,8 +69,14 @@ public class Construct implements ExpressionOrStatement {
   public String render() {
     StringBuilder sb = new StringBuilder();
     sb.append("new ").append(type.getFullyQualifiedName());
-    if (!parameters.isEmpty()) {
-      sb.append(parameters.stream().map(TypeRef::render).collect(java.util.stream.Collectors.joining(", ", "<", ">")));
+    if (!type.getArguments().isEmpty()) {
+      if (parameters.isEmpty()) {
+        // The type has generic arguments, but no parameters were supplied.
+        // Use the diamond operator to avoid warnings in the output.
+        sb.append("<>");
+      } else {
+        sb.append(parameters.stream().map(TypeRef::render).collect(java.util.stream.Collectors.joining(", ", "<", ">")));
+      }
     }
     sb.append(
         arguments.stream().map(Expression::renderExpression).collect(java.util.stream.Collectors.joining(", ", "(", ")")));
