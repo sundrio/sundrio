@@ -20,9 +20,6 @@ import static io.sundr.builder.Constants.*;
 import static io.sundr.builder.internal.utils.BuilderUtils.*;
 import static io.sundr.model.utils.Types.isAbstract;
 
-import java.time.Clock;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -797,7 +794,6 @@ public class ClazzAs {
     return new AnnotationRefBuilder()
         .withClassRef(ClassRef.forName(javax.annotation.processing.Generated.class.getCanonicalName()))
         .addToParameters("value", "io.sundr:builder-annotations")
-        .addToParameters("date", OffsetDateTime.now(Clock.systemDefaultZone()).truncatedTo(ChronoUnit.MILLIS).toString())
         .build();
   }
 }
