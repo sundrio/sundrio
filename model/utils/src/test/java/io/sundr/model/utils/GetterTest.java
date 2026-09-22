@@ -18,6 +18,7 @@
 package io.sundr.model.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,7 @@ import io.sundr.model.Method;
 import io.sundr.model.MethodBuilder;
 import io.sundr.model.TypeDef;
 import io.sundr.model.TypeDefBuilder;
+import io.sundr.model.TypeRef;
 
 public class GetterTest {
 
@@ -48,5 +50,81 @@ public class GetterTest {
 
     assertEquals(m1, Getter.find(type, f1));
     assertEquals(m2, Getter.find(type, f2));
+  }
+
+  @Test
+  public void getterForEscapedKeywordField() {
+    Field field = field("_continue", Types.STRING_REF);
+    Method getter = method("getContinue", Types.STRING_REF);
+
+    assertEquals(getter, Getter.find(type(field, getter), field));
+  }
+
+  @Test
+  public void booleanGetterForEscapedKeywordField() {
+    Field field = field("_native", Types.PRIMITIVE_BOOLEAN_REF);
+    Method getter = method("isNative", Types.PRIMITIVE_BOOLEAN_REF);
+
+    assertEquals(getter, Getter.find(type(field, getter), field));
+  }
+
+  @Test
+  public void getterForNonAlphaField() {
+    Field field = field("$ref", Types.STRING_REF);
+    Method getter = method("get$ref", Types.STRING_REF);
+
+    assertEquals(getter, Getter.find(type(field, getter), field));
+  }
+
+  @Test
+  public void getterKeepingTheEscapedNameOfAFieldStartingWithADigit() {
+    Field field = field("_1h", Types.STRING_REF);
+    Method getter = method("get_1h", Types.STRING_REF);
+
+    assertEquals(getter, Getter.find(type(field, getter), field));
+  }
+
+  @Test
+  public void getterOfAnotherFieldWithTheSameSuffixIsIgnored() {
+    Field field = field("_continue", Types.STRING_REF);
+    Method other = method("getAutoContinue", Types.STRING_REF);
+    Method getter = method("getContinue", Types.STRING_REF);
+
+    assertEquals(getter, Getter.find(type(field, other, getter), field));
+  }
+
+  @Test
+  public void getterClosestToTheFieldNameWinsRegardlessOfOrder() {
+    Field field = field("_id", Types.STRING_REF);
+    Method normalized = method("getId", Types.STRING_REF);
+    Method getter = method("get_id", Types.STRING_REF);
+
+    assertEquals(getter, Getter.find(type(field, normalized, getter), field));
+    assertEquals(getter, Getter.find(type(field, getter, normalized), field));
+  }
+
+  @Test
+  public void bareGetIsNotAGetterOfAFieldWithoutAlphanumericCharacters() {
+    Field field = field("__", Types.STRING_REF);
+    Method bare = method("get", Types.STRING_REF);
+    Method getter = method("get__", Types.STRING_REF);
+
+    assertEquals(getter, Getter.find(type(field, bare, getter), field));
+    assertFalse(Getter.findOptional(type(field, bare), field).isPresent());
+  }
+
+  private static Field field(String name, TypeRef type) {
+    return new FieldBuilder().withName(name).withTypeRef(type).build();
+  }
+
+  private static Method method(String name, TypeRef returnType) {
+    return new MethodBuilder().withName(name).withReturnType(returnType).build();
+  }
+
+  private static TypeDef type(Field field, Method... methods) {
+    return new TypeDefBuilder(TypeDef.forName("MyType"))
+        .withFields(field)
+        .withMethods(methods)
+        .build();
   }
 }

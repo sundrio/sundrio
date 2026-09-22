@@ -23,6 +23,7 @@ import java.util.function.Function;
 
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 
 import io.sundr.SundrException;
 import io.sundr.model.ClassRef;
@@ -43,6 +44,11 @@ public class TypePrameterElementToTypeParamDef implements Function<TypeParameter
   public TypeParamDef apply(TypeParameterElement item) {
     List<ClassRef> typeRefs = new ArrayList<>();
 
+    // The bound of a type variable declared by a type that can't be resolved yet (e.g. a class
+    // generated later in this round) is null, and javac's getBounds() would throw.
+    if (item.asType() instanceof TypeVariable && ((TypeVariable) item.asType()).getUpperBound() == null) {
+      return new TypeParamDefBuilder().withName(item.getSimpleName().toString()).build();
+    }
     try {
       for (TypeMirror typeMirror : item.getBounds()) {
         TypeRef typeRef = referenceAdapterFunction.apply(typeMirror);
@@ -51,8 +57,8 @@ public class TypePrameterElementToTypeParamDef implements Function<TypeParameter
         }
       }
     } catch (Exception e) {
-      //if we can't process bound just return the type without any.
-      throw new SundrException("Failed to get bounds of type: " + item.toString() + "." + Messages.POTENTIAL_UNRESOLVED_SYMBOL,
+      throw new SundrException("Failed to get bounds of type: " + item.toString() + " of " + item.getGenericElement() + ". "
+          + Messages.POTENTIAL_UNRESOLVED_SYMBOL,
           e);
     }
 

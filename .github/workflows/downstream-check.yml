@@ -32,21 +32,32 @@ jobs:
     if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'downstream-check') || github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     strategy:
       matrix:
-        java: [11]
+        java: [17]
         profile: [normal]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v3
       - name: Setup Java
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-      - name: Build 
+      - name: Build
         run: ./mvnw ${MAVEN_ARGS} clean install -Dformat.skip=true
-      - name: Build Kubernetes Client
+      - name: Checkout Kubernetes Client
         run: |
-          SUNDRIO_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          SUNDRIO_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+          test -n "$SUNDRIO_VERSION"
+          echo "SUNDRIO_VERSION=$SUNDRIO_VERSION" >> "$GITHUB_ENV"
           git clone https://github.com/fabric8io/kubernetes-client
-          cd kubernetes-client
-          ./mvnw ${MAVEN_ARGS} clean install -Dsundrio.version=$SUNDRIO_VERSION -Dkaraf.itest.skip=true
+      # The Kubernetes Client model Builders are committed sources, regenerating them is what exercises the processor.
+      # Tests are skipped here, the next step runs them.
+      - name: Regenerate Kubernetes Client Builders
+        working-directory: kubernetes-client
+        run: make openapi-generate-java-classes MAVEN_ARGS="${MAVEN_ARGS} -DskipTests -Dsundrio.version=${SUNDRIO_VERSION}"
+      - name: Regenerated Builders changes
+        working-directory: kubernetes-client
+        run: git --no-pager diff --stat
+      - name: Build Kubernetes Client
+        working-directory: kubernetes-client
+        run: ./mvnw ${MAVEN_ARGS} clean install -Dsundrio.version=${SUNDRIO_VERSION} -Dkaraf.itest.skip=true

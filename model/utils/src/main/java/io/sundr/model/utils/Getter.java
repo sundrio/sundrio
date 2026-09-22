@@ -18,7 +18,10 @@ package io.sundr.model.utils;
 
 import static io.sundr.utils.Strings.capitalizeFirst;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.sundr.SundrException;
@@ -38,6 +41,8 @@ public class Getter {
   public static final String SHOULD_PREFIX = "should";
   public static final VoidRef VOID = new VoidRef();
 
+  private static final String[] PREFIXES = { GET_PREFIX, IS_PREFIX, SHOULD_PREFIX };
+
   public static Optional<Method> findOptional(TypeDef clazz, Field field) {
     try {
       return Optional.of(find(clazz, field));
@@ -55,45 +60,42 @@ public class Getter {
    */
   public static Method find(TypeDef clazz, Field field) {
     RichTypeDef richType = clazz instanceof RichTypeDef ? (RichTypeDef) clazz : TypeArguments.apply(clazz);
-    //1st pass strict
-    boolean acceptPrefixless = Record.is(clazz);
+    List<Method> candidates = richType.getAllMethods().stream()
+        .filter(m -> Assignable.isAssignable(m.getReturnType()).from(field.getTypeRef()))
+        .collect(Collectors.toList());
 
-    String capitalized = capitalizeFirst(field.getName());
-    String fullyCapitalized = field.getNameCapitalized();
-    boolean nonAlpha = !Character.isAlphabetic(field.getName().charAt(0));
-    String[] prefixes = new String[] { GET_PREFIX, IS_PREFIX, SHOULD_PREFIX };
+    if (Record.is(clazz)) {
+      return candidates.stream()
+          .filter(m -> m.getName().equals(field.getName()))
+          .findFirst()
+          .orElseThrow(() -> noGetterFound(clazz, richType, field));
+    }
 
-    for (Method method : richType.getAllMethods()) {
-      if (!Assignable.isAssignable(method.getReturnType()).from(field.getTypeRef())) {
-        continue;
-      }
+    // Names the getter may use after its prefix, closest to the field name first:
+    // get_Id() or getName(), then get_1h() or get$ref(), then getContinue() for _continue.
+    Set<String> names = new LinkedHashSet<>();
+    names.add(capitalizeFirst(field.getName()));
+    if (!Character.isAlphabetic(field.getName().charAt(0))) {
+      //Some frameworks/tools consider valid getters cases like: get$ref() (e.g. jsonschema2pojo).
+      names.add(field.getName());
+    }
+    names.add(field.getNameCapitalized());
+    names.remove("");
 
-      if (acceptPrefixless) {
-        if (method.getName().equals(field.getName())) {
-          return method;
-        }
-        continue;
-      }
-      boolean possibleMatch = false;
-      if (method.getName().endsWith(capitalized)) {
-        possibleMatch = true;
-      } else if (method.getName().endsWith(fullyCapitalized)) {
-        possibleMatch = true;
-      } else if (nonAlpha && method.getName().endsWith(field.getName())) {
-        //Some frameworks/tools consider valid getters cases like: get$ref() (e.g. jsonschema2pojo).
-        possibleMatch = true;
-      }
-      if (possibleMatch) {
-        for (int i = 0; i < prefixes.length; i++) {
-          if (method.getName().startsWith(prefixes[i])
-              && method.getName().length() == prefixes[i].length() + field.getName().length()) {
+    for (String name : names) {
+      for (Method method : candidates) {
+        for (String prefix : PREFIXES) {
+          if (method.getName().equals(prefix + name)) {
             return method;
           }
         }
       }
     }
+    throw noGetterFound(clazz, richType, field);
+  }
 
-    throw new SundrException(
+  private static SundrException noGetterFound(TypeDef clazz, RichTypeDef richType, Field field) {
+    return new SundrException(
         "No getter found for field: [" + field.toString() + "] on class: " + clazz.getFullyQualifiedName()
             + ", getters found: ["
             + richType.getAllMethods().stream().filter(Getter::is).map(m -> m.getReturnType() + " " + m.getName())
